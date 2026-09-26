@@ -53,3 +53,37 @@ class FrameworkRule(Base):
         default="HIGH",
     )
     remediation_hint = Column(Text, nullable=True)
+
+
+class SecurityBaselineModel(Base):
+    __tablename__ = "security_baseline_models"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    config_file_id = Column(
+        Integer,
+        ForeignKey("config_files.id"),
+        nullable=False,
+        unique=True,
+    )
+
+    vendor = Column(String, nullable=False)
+    os = Column(String, nullable=False)
+    hostname = Column(String, nullable=True)
+
+    sbm_json = Column(Text, nullable=False)
+
+    confidence = Column(
+        Float,
+        nullable=False,
+    )
+
+    unknown_blocks_json = Column(
+        Text,
+        nullable=False,
+    )
+
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+    )

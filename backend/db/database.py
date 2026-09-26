@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 
 DATABASE_URL = "sqlite:///./netguard.db"
@@ -14,3 +14,5 @@ SessionLocal = sessionmaker(
     autoflush=False,
     bind=engine,
 )
+
+Base = declarative_base()

@@ -1,0 +1,18 @@
+{
+  "name": "DISA STIGs",
+  "version": "General Network Device",
+  "source": "builtin",
+  "rules": [
+    {
+      "control_id": "STIG-NET-01",
+      "category": "Remote Access",
+      "title": "Telnet must be disabled",
+      "description": "Insecure remote access protocols should be disabled.",
+      "sbm_field_path": "security_controls.remote_access_protocols.telnet.enabled",
+      "expected_value": "false",
+      "operator": "eq",
+      "severity": "CRITICAL",
+      "remediation_hint": "Disable Telnet and use SSH."
+    }
+  ]
+}

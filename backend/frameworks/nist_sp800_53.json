@@ -1,0 +1,18 @@
+{
+  "name": "NIST SP 800-53",
+  "version": "Rev 5",
+  "source": "builtin",
+  "rules": [
+    {
+      "control_id": "AC-2",
+      "category": "Access Control",
+      "title": "Account management must be configured",
+      "description": "Systems should maintain controlled account management.",
+      "sbm_field_path": "security_controls.authentication.account_management.enabled",
+      "expected_value": "true",
+      "operator": "eq",
+      "severity": "HIGH",
+      "remediation_hint": "Enable account management controls."
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "name": "ISO/IEC 27001",
+  "version": "2022",
+  "source": "builtin",
+  "rules": [
+    {
+      "control_id": "ISO-A.8.20",
+      "category": "Network Security",
+      "title": "Network security controls must be configured",
+      "description": "Network security should be appropriately managed.",
+      "sbm_field_path": "security_controls.network_security.enabled",
+      "expected_value": "true",
+      "operator": "eq",
+      "severity": "HIGH",
+      "remediation_hint": "Enable appropriate network security controls."
+    }
+  ]
+}

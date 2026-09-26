@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 
+from db.database import engine
+
 app = FastAPI()
 
 

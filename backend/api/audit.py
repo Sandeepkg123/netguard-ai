@@ -3,6 +3,9 @@ import json
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
+from fastapi.responses import FileResponse
+
+from core.pdf_generator import PDFReportGenerator
 
 from core.compliance_engine import run_compliance_check
 from core.remediation_engine import RemediationEngine
@@ -233,3 +236,101 @@ def get_audit(
         ),
         "created_at": audit.created_at,
     }
+
+@router.get("/audit/{audit_id}/pdf")
+def get_audit_pdf(
+    audit_id: int,
+    db: Session = Depends(get_db),
+):
+    audit = (
+        db.query(Audit)
+        .filter(Audit.id == audit_id)
+        .first()
+    )
+
+    if not audit:
+        raise HTTPException(
+            status_code=404,
+            detail="Audit not found",
+        )
+
+    config_file = (
+        db.query(ConfigFile)
+        .filter(
+            ConfigFile.id == audit.config_file_id
+        )
+        .first()
+    )
+
+    framework = (
+        db.query(Framework)
+        .filter(
+            Framework.id == audit.framework_id
+        )
+        .first()
+    )
+
+    if not config_file:
+        raise HTTPException(
+            status_code=404,
+            detail="Configuration file not found",
+        )
+
+    if not framework:
+        raise HTTPException(
+            status_code=404,
+            detail="Framework not found",
+        )
+
+    audit_data = {
+        "audit_id": audit.id,
+        "filename": config_file.filename,
+        "vendor": None,
+        "os": None,
+        "hostname": None,
+        "framework": {
+            "id": framework.id,
+            "name": framework.name,
+            "version": framework.version,
+        },
+        "total_controls": audit.total_controls,
+        "passed": audit.passed,
+        "failed": audit.failed,
+        "score": audit.score,
+        "findings": json.loads(
+            audit.findings_json
+        ),
+        "created_at": audit.created_at,
+    }
+
+    sbm_record = (
+        db.query(SecurityBaselineModel)
+        .filter(
+            SecurityBaselineModel.config_file_id
+            == audit.config_file_id
+        )
+        .first()
+    )
+
+    if sbm_record:
+        audit_data["vendor"] = sbm_record.vendor
+        audit_data["os"] = sbm_record.os
+        audit_data["hostname"] = sbm_record.hostname
+
+    generator = PDFReportGenerator()
+
+    filename = f"audit_{audit.id}.pdf"
+
+    pdf_path = generator.generate(
+        audit=audit_data,
+        filename=filename,
+    )
+
+    audit.pdf_path = pdf_path
+    db.commit()
+
+    return FileResponse(
+        path=pdf_path,
+        media_type="application/pdf",
+        filename=filename,
+    )

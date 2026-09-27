@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from core.compliance_engine import run_compliance_check
+from core.remediation_engine import RemediationEngine
 from db.database import SessionLocal
 from db.models import (
     Audit,
@@ -107,6 +108,24 @@ def run_audit(
         sbm,
         rules,
     )
+
+    remediation_engine = RemediationEngine()
+
+    for finding in findings:
+
+        if finding["status"] != "FAIL":
+            continue
+
+        remediation = remediation_engine.generate(
+            finding=finding,
+            vendor=sbm_record.vendor,
+            os_version=sbm_record.os,
+            db=db,
+        )
+
+        finding["remediation"] = (
+            remediation.model_dump()
+        )
 
     total_controls = len(findings)
 

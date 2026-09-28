@@ -334,3 +334,56 @@ def get_audit_pdf(
         media_type="application/pdf",
         filename=filename,
     )
+
+@router.get("/reports")
+def get_reports(
+    db: Session = Depends(get_db),
+):
+    audits = (
+        db.query(Audit)
+        .order_by(Audit.created_at.desc())
+        .all()
+    )
+
+    total_audits = len(audits)
+
+    average_score = (
+        sum(audit.score for audit in audits) / total_audits
+        if total_audits
+        else 0
+    )
+
+    recent = []
+
+    for audit in audits[:10]:
+        config = (
+            db.query(ConfigFile)
+            .filter(ConfigFile.id == audit.config_file_id)
+            .first()
+        )
+
+        framework = (
+            db.query(Framework)
+            .filter(Framework.id == audit.framework_id)
+            .first()
+        )
+
+        recent.append(
+            {
+                "audit_id": audit.id,
+                "filename": config.filename if config else None,
+                "framework": framework.name
+                if framework
+                else None,
+                "score": audit.score,
+                "passed": audit.passed,
+                "failed": audit.failed,
+                "created_at": audit.created_at,
+            }
+        )
+
+    return {
+        "total_audits": total_audits,
+        "average_score": round(average_score, 2),
+        "recent_audits": recent,
+    }

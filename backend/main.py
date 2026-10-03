@@ -8,6 +8,7 @@ from db import models
 from db.database import SessionLocal, engine, Base
 from db.seed_frameworks import seed_frameworks
 from api.audit import router as audit_router
+from api.training import router as training_router
 
 app = FastAPI()
 
@@ -41,7 +42,10 @@ app.include_router(
     audit_router,
     prefix="/api",
 )
-
+app.include_router(
+    training_router,
+    prefix="/api",
+)
 
 @app.get("/api/health")
 def health_check():

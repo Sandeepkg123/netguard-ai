@@ -8,6 +8,7 @@ import Audit from "./pages/Audit";
 import Report from "./pages/Report";
 import SBMViewer from "./pages/SBMViewer";
 import Frameworks from "./pages/Frameworks";
+import Training from "./pages/Training";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/report/:auditId" element={<Report />} />
           <Route path="/sbm/:fileId" element={<SBMViewer />} />
           <Route path="/frameworks" element={<Frameworks />} />
+          <Route path="/training" element={<Training />} />
         </Route>
       </Routes>
     </BrowserRouter>

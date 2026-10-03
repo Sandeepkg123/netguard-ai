@@ -67,3 +67,27 @@ export function getPdfUrl(auditId) {
 export async function getReports() {
   return request("/reports");
 }
+
+export async function getPendingTraining() {
+  return request("/training/pending");
+}
+
+export async function saveTrainingLabel(data) {
+  return request("/training/label", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+}
+
+export async function reanalyzeConfig(fileId) {
+  return request(`/training/reanalyze/${fileId}`, {
+    method: "POST",
+  });
+}
+
+export async function getTrainingLabels() {
+  return request("/training/labels");
+}

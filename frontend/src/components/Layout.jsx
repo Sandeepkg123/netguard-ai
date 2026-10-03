@@ -4,6 +4,7 @@ function Layout() {
   const links = [
     { path: "/", label: "Dashboard" },
     { path: "/upload", label: "Upload Config" },
+    { path: "/training", label: "Training Center" },
     { path: "/frameworks", label: "Frameworks" },
   ];
 

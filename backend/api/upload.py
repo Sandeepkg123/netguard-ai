@@ -1,14 +1,14 @@
 import hashlib
 import json
 
-from core.ai_parser import AIParser
-from db.models import ConfigFile, SecurityBaselineModel
-
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
+from core.ai_parser import AIParser
+from core.gemini_client import GeminiClient
+
 from db.database import SessionLocal
-from db.models import ConfigFile
+from db.models import ConfigFile, SecurityBaselineModel
 
 
 router = APIRouter()
@@ -62,7 +62,10 @@ async def upload_config(
     db.add(config_file)
     db.commit()
     db.refresh(config_file)
-    parser = AIParser()
+
+    gemini_client = GeminiClient()
+    parser = AIParser(gemini_client)
+
     sbm = parser.parse(raw_config)
 
     sbm_record = SecurityBaselineModel(
@@ -84,12 +87,12 @@ async def upload_config(
 
     db.add(sbm_record)
     db.commit()
-    db.refresh(sbm_record)   
+    db.refresh(sbm_record)
 
     return {
         "id": config_file.id,
         "filename": config_file.filename,
         "file_hash": config_file.file_hash,
         "message": "Configuration uploaded and analyzed successfully",
-        "sbm": sbm.model_dump(),   
+        "sbm": sbm.model_dump(),
     }

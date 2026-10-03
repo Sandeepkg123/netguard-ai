@@ -180,3 +180,58 @@ class RemediationCache(Base):
             name="uq_remediation_vendor_control",
         ),
     )
+
+
+class TrainingLabel(Base):
+    __tablename__ = "training_labels"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    # Configuration where the admin created this example
+    config_file_id = Column(
+        Integer,
+        ForeignKey("config_files.id"),
+        nullable=False,
+    )
+
+    vendor = Column(
+        String,
+        nullable=False,
+        default="unknown",
+    )
+
+    os = Column(
+        String,
+        nullable=False,
+        default="unknown",
+    )
+
+    # Original configuration line
+    raw_line = Column(
+        Text,
+        nullable=False,
+    )
+
+    # SBM destination
+    sbm_field_path = Column(
+        String,
+        nullable=False,
+    )
+
+    # Meaning/value identified by the admin
+    mapped_value = Column(
+        Text,
+        nullable=False,
+    )
+
+    # Only approved mappings are used by Gemini
+    status = Column(
+        String,
+        nullable=False,
+        default="approved",
+    )
+
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+    )
